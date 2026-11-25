@@ -1,0 +1,2033 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-tema="claro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Geração de planejamentos mensais para a Educação Infantil com base na BNCC, com calendário estudantil opcional.">
+<meta name="theme-color" content="#F5A21B">
+<title>PlanoBNCC · Planejamento mensal — Educação Infantil</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ===== PlanoBNCC — base ===== */
+:root {
+  --sol: #F5A21B;
+  --sol-vivo: #DE8A06;
+  --sol-tinta: #3A2708;
+  --sol-suave: #FFF1D6;
+  --coral: #EF6A4C;
+  --coral-suave: #FDE7E0;
+  --folha: #3D9B63;
+  --folha-suave: #E1F3E7;
+  --ceu: #3E97C9;
+  --ceu-suave: #E1EFF7;
+  --papel: #FFF8EC;
+  --carta: #FFFFFF;
+  --carta-2: #FFFBF3;
+  --tinta: #43301C;
+  --tinta-2: #7D6448;
+  --borda: #F0DFC0;
+  --borda-forte: #E0C795;
+  --sombra: 0 16px 38px rgba(173, 112, 26, .13);
+  --sombra-leve: 0 4px 14px rgba(173, 112, 26, .10);
+  --decor-a: rgba(245, 162, 27, .16);
+  --decor-b: rgba(62, 151, 201, .13);
+  --decor-ponto: rgba(173, 112, 26, .11);
+  --fonte-titulo: "Fredoka", "Trebuchet MS", sans-serif;
+  --fonte-corpo: "Nunito", "Segoe UI", sans-serif;
+  --raio: 18px;
+}
+
+html[data-tema="escuro"] {
+  --sol: #FFB53A;
+  --sol-vivo: #FFC866;
+  --sol-tinta: #2E1F04;
+  --sol-suave: #3D2E12;
+  --coral: #FF8A6B;
+  --coral-suave: #43241B;
+  --folha: #5BC48A;
+  --folha-suave: #1F3829;
+  --ceu: #6FB9E3;
+  --ceu-suave: #1D3242;
+  --papel: #1F1810;
+  --carta: #2B2216;
+  --carta-2: #332A1B;
+  --tinta: #F6ECD9;
+  --tinta-2: #C0A987;
+  --borda: #46381F;
+  --borda-forte: #5C4A29;
+  --sombra: 0 16px 38px rgba(0, 0, 0, .40);
+  --sombra-leve: 0 4px 14px rgba(0, 0, 0, .30);
+  --decor-a: rgba(255, 181, 58, .10);
+  --decor-b: rgba(111, 185, 227, .09);
+  --decor-ponto: rgba(255, 213, 150, .07);
+}
+
+* { box-sizing: border-box; }
+
+[hidden] { display: none !important; }
+
+html.tema-anim, html.tema-anim body, html.tema-anim * {
+  transition: background-color .35s ease, color .35s ease, border-color .35s ease !important;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--papel);
+  color: var(--tinta);
+  font-family: var(--fonte-corpo);
+  font-size: 15.5px;
+  line-height: 1.55;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 14% 6%, var(--decor-a), transparent 34%),
+    radial-gradient(circle at 88% 0%, var(--decor-b), transparent 32%),
+    radial-gradient(var(--decor-ponto) 1.3px, transparent 1.3px);
+  background-size: auto, auto, 26px 26px;
+}
+
+img, svg { max-width: 100%; height: auto; }
+
+.input-arquivo {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+h1, h2, h3 { font-family: var(--fonte-titulo); font-weight: 600; margin: 0; }
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.corpo { max-width: 1180px; margin: 0 auto; padding: 0 clamp(14px, 3vw, 28px) 46px; }
+
+/* ===== topo ===== */
+.topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 20px 0 12px;
+}
+
+.marca { display: flex; align-items: center; gap: 12px; }
+
+.marca .emblema { width: 46px; height: 46px; border-radius: 13px; box-shadow: var(--sombra-leve); flex: none; }
+
+.marca .nome { display: flex; flex-direction: column; line-height: 1.15; }
+.marca .nome strong { font-family: var(--fonte-titulo); font-size: 1.28rem; font-weight: 600; color: var(--tinta); }
+.marca .nome span { font-size: .82rem; font-weight: 700; color: var(--tinta-2); letter-spacing: .02em; }
+
+.acoes-topo { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+/* seletor de tema */
+.troca-tema {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--carta-2);
+  border: 1px solid var(--borda);
+  border-radius: 999px;
+}
+
+.troca-tema button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: .82rem;
+  color: var(--tinta-2);
+  transition: background .2s, color .2s, box-shadow .2s;
+}
+
+.troca-tema button svg { width: 15px; height: 15px; }
+
+.troca-tema button[aria-checked="true"] {
+  background: var(--sol);
+  color: var(--sol-tinta);
+  box-shadow: var(--sombra-leve);
+}
+
+.icone-redondo {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--carta-2);
+  border: 1px solid var(--borda);
+  color: var(--tinta-2);
+  transition: transform .2s, color .2s, border-color .2s;
+}
+
+.icone-redondo svg { width: 19px; height: 19px; }
+.icone-redondo:hover { transform: rotate(18deg); color: var(--sol-vivo); border-color: var(--borda-forte); }
+
+/* ===== apresentação ===== */
+.apresentacao { text-align: center; padding: 10px 0 18px; }
+.apresentacao h1 { font-size: clamp(1.55rem, 3.6vw, 2.15rem); color: var(--tinta); }
+.apresentacao h1 em { font-style: normal; color: var(--sol-vivo); }
+.apresentacao p { margin: 6px auto 0; max-width: 640px; color: var(--tinta-2); font-weight: 600; font-size: .95rem; }
+
+/* ===== palco ===== */
+.palco {
+  display: grid;
+  grid-template-columns: minmax(340px, 400px) minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.painel {
+  background: var(--carta);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra);
+  overflow: hidden;
+}
+
+.painel-cabeca {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--borda);
+  background: var(--carta-2);
+}
+
+.painel-cabeca h2 { font-size: 1.06rem; display: flex; align-items: center; gap: 9px; }
+.painel-cabeca h2 .bola { width: 10px; height: 10px; border-radius: 50%; background: var(--sol); flex: none; }
+.painel-cabeca h2 .bola.folha { background: var(--folha); }
+
+.painel-corpo { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+
+/* ===== campos ===== */
+.campo { display: flex; flex-direction: column; gap: 6px; }
+.campo > label { font-weight: 800; font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; color: var(--tinta-2); }
+.dica-campo { font-size: .78rem; color: var(--tinta-2); font-weight: 600; }
+
+.linha-dupla { display: grid; grid-template-columns: 1.6fr 1fr; gap: 12px; }
+
+input[type="text"], input[type="number"], input[type="password"], select, textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid var(--borda);
+  border-radius: 12px;
+  background: var(--carta-2);
+  color: var(--tinta);
+  font-family: var(--fonte-corpo);
+  font-weight: 700;
+  font-size: .95rem;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+
+select { appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--tinta-2) 50%), linear-gradient(135deg, var(--tinta-2) 50%, transparent 50%); background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%; background-size: 5px 5px; background-repeat: no-repeat; padding-right: 34px; }
+
+textarea { resize: vertical; min-height: 74px; line-height: 1.5; }
+
+input:focus, select:focus, textarea:focus { border-color: var(--sol); box-shadow: 0 0 0 3px rgba(245, 162, 27, .22); }
+
+/* grupo — segmentado */
+.segmentado { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; background: var(--carta-2); border: 1.5px solid var(--borda); border-radius: 14px; padding: 5px; }
+
+.segmentado button {
+  padding: 9px 6px;
+  border-radius: 10px;
+  font-family: var(--fonte-titulo);
+  font-weight: 600;
+  font-size: .92rem;
+  color: var(--tinta-2);
+  transition: background .2s, color .2s, box-shadow .2s;
+}
+
+.segmentado button[aria-checked="true"] { background: var(--sol); color: var(--sol-tinta); box-shadow: var(--sombra-leve); }
+
+.prefixo-codigo {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: var(--folha-suave);
+  color: var(--folha);
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .03em;
+}
+
+/* ===== anexos ===== */
+.zona-arquivo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 18px 14px;
+  border: 2px dashed var(--borda-forte);
+  border-radius: 14px;
+  background: var(--carta-2);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .2s, background .2s, transform .2s;
+}
+
+.zona-arquivo svg { width: 30px; height: 30px; color: var(--sol-vivo); }
+.zona-arquivo strong { font-family: var(--fonte-titulo); font-weight: 600; font-size: .95rem; color: var(--tinta); }
+.zona-arquivo span { font-size: .78rem; font-weight: 700; color: var(--tinta-2); }
+.zona-arquivo:hover, .zona-arquivo.foco { border-color: var(--sol); background: var(--sol-suave); transform: translateY(-1px); }
+
+.lista-arquivos { display: flex; flex-direction: column; gap: 8px; }
+
+.arquivo-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--borda);
+  border-radius: 12px;
+  background: var(--carta-2);
+}
+
+.arquivo-item .selo { width: 34px; height: 34px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 9px; font-size: .62rem; font-weight: 800; letter-spacing: .04em; color: #fff; }
+.arquivo-item .selo.pdf { background: var(--coral); }
+.arquivo-item .selo.img { background: var(--ceu); }
+.arquivo-item .selo.txt { background: var(--folha); }
+.arquivo-item .info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.arquivo-item .info strong { font-size: .84rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.arquivo-item .info span { font-size: .72rem; color: var(--tinta-2); font-weight: 700; }
+.arquivo-item button.remover { width: 26px; height: 26px; border-radius: 50%; flex: none; display: flex; align-items: center; justify-content: center; background: var(--coral-suave); color: var(--coral); font-weight: 800; font-size: .9rem; transition: transform .15s; }
+.arquivo-item button.remover:hover { transform: scale(1.12); }
+
+/* ===== botão gerar ===== */
+.botao-gerar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: var(--sol);
+  color: var(--sol-tinta);
+  font-family: var(--fonte-titulo);
+  font-weight: 600;
+  font-size: 1.05rem;
+  box-shadow: 0 10px 24px rgba(222, 138, 6, .35);
+  transition: transform .18s, box-shadow .18s, background .18s;
+}
+
+.botao-gerar svg { width: 20px; height: 20px; }
+.botao-gerar:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(222, 138, 6, .42); background: var(--sol-vivo); color: #fff; }
+.botao-gerar:disabled { opacity: .65; cursor: progress; transform: none; }
+
+.botao-gerar .giro { animation: girar 1s linear infinite; }
+.botao-gerar.carregando .icone { animation: girar 1.4s linear infinite; }
+@keyframes girar { to { transform: rotate(360deg); } }
+
+/* ===== resultado ===== */
+.alternador { display: inline-flex; gap: 4px; padding: 4px; background: var(--papel); border: 1px solid var(--borda); border-radius: 999px; }
+.alternador button { padding: 5px 13px; border-radius: 999px; font-size: .8rem; font-weight: 800; color: var(--tinta-2); transition: background .2s, color .2s; }
+.alternador button[aria-checked="true"] { background: var(--sol); color: var(--sol-tinta); }
+
+.ferramentas { display: flex; flex-wrap: wrap; gap: 8px; }
+.ferramentas button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border-radius: 999px;
+  border: 1.5px solid var(--borda);
+  background: var(--carta-2);
+  color: var(--tinta-2);
+  font-weight: 800;
+  font-size: .8rem;
+  transition: border-color .2s, color .2s, transform .15s;
+}
+.ferramentas button:hover:not(:disabled) { border-color: var(--sol); color: var(--sol-vivo); transform: translateY(-1px); }
+.ferramentas button:disabled { opacity: .45; cursor: not-allowed; }
+.ferramentas button svg { width: 14px; height: 14px; }
+
+.etiquetas { display: flex; flex-wrap: wrap; gap: 6px; }
+.etiqueta { padding: 3px 11px; border-radius: 999px; font-size: .74rem; font-weight: 800; letter-spacing: .02em; }
+.etiqueta.mes { background: var(--sol-suave); color: var(--sol-vivo); }
+.etiqueta.grupo { background: var(--folha-suave); color: var(--folha); }
+.etiqueta.modelo { background: var(--ceu-suave); color: var(--ceu); }
+
+.resultado-solo { padding: 26px 22px; }
+
+/* estados */
+.estado { text-align: center; padding: 34px 18px; }
+.estado svg { width: 200px; height: auto; margin-bottom: 10px; }
+.estado h3 { font-size: 1.12rem; color: var(--tinta); }
+.estado p { margin: 6px auto 0; max-width: 420px; color: var(--tinta-2); font-weight: 600; font-size: .9rem; }
+
+.estado-carregando { text-align: center; padding: 44px 18px; }
+.estado-carregando .sol-gira { width: 54px; height: 54px; margin: 0 auto 14px; animation: girar 2.4s linear infinite; }
+.estado-carregando h3 { font-size: 1.1rem; }
+.estado-carregando p { margin: 6px auto 0; color: var(--tinta-2); font-weight: 700; font-size: .88rem; }
+
+.erro-caixa { margin: 26px 22px; padding: 18px; border-radius: 14px; background: var(--coral-suave); border: 1.5px solid var(--coral); text-align: center; }
+.erro-caixa strong { font-family: var(--fonte-titulo); font-weight: 600; font-size: 1rem; color: var(--coral); }
+.erro-caixa p { margin: 6px 0 12px; color: var(--tinta); font-weight: 600; font-size: .88rem; overflow-wrap: anywhere; }
+.erro-caixa button { padding: 8px 16px; border-radius: 999px; background: var(--coral); color: #fff; font-weight: 800; font-size: .84rem; transition: transform .15s; }
+.erro-caixa button:hover { transform: translateY(-1px); }
+
+/* tabela renderizada */
+.rolagem-tabela { overflow-x: auto; padding: 0 16px 20px; -webkit-overflow-scrolling: touch; }
+
+table.plano { width: 100%; min-width: 600px; border-collapse: separate; border-spacing: 0; border: 1.5px solid var(--borda); border-radius: 14px; overflow: hidden; }
+
+table.plano th {
+  position: sticky;
+  top: 0;
+  background: var(--sol-suave);
+  color: var(--sol-tinta);
+  font-family: var(--fonte-titulo);
+  font-weight: 600;
+  font-size: .8rem;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  text-align: left;
+  padding: 12px 14px;
+  border-bottom: 2px solid var(--sol);
+}
+
+html[data-tema="escuro"] table.plano th { color: var(--tinta); }
+
+table.plano td {
+  vertical-align: top;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--borda);
+  font-size: .88rem;
+  line-height: 1.55;
+}
+
+table.plano tbody tr:nth-child(even) td { background: var(--carta-2); }
+table.plano tbody tr:last-child td { border-bottom: none; }
+
+td.col-data { white-space: nowrap; }
+td.col-data .data-pilula { display: inline-block; padding: 3px 12px; border-radius: 999px; background: var(--sol); color: var(--sol-tinta); font-weight: 800; font-size: .82rem; }
+td.col-eixo em { display: block; font-style: italic; color: var(--ceu); font-weight: 700; }
+td.col-codigos .codigo { display: inline-block; margin: 2px 0; padding: 2px 9px; border-radius: 7px; background: var(--folha-suave); color: var(--folha); font-weight: 800; font-size: .78rem; font-family: "JetBrains Mono", ui-monospace, monospace; }
+td.col-detalhe div.linha-ativ { position: relative; padding-left: 14px; }
+td.col-detalhe div.linha-ativ + div.linha-ativ { margin-top: 6px; }
+td.col-detalhe div.linha-ativ::before { content: ""; position: absolute; left: 0; top: .52em; width: 6px; height: 6px; border-radius: 50%; background: var(--coral); }
+
+/* markdown cru */
+.visao-markdown { margin: 0; padding: 18px 22px 22px; overflow: auto; max-height: 620px; }
+.visao-markdown code { display: block; font-family: "JetBrains Mono", ui-monospace, monospace; font-size: .8rem; line-height: 1.6; color: var(--tinta); white-space: pre; }
+
+/* ===== modal ===== */
+dialog.modal { border: none; padding: 0; border-radius: var(--raio); background: var(--carta); color: var(--tinta); box-shadow: var(--sombra); width: min(720px, calc(100vw - 32px)); }
+dialog.modal::backdrop { background: rgba(43, 28, 8, .45); backdrop-filter: blur(3px); }
+
+.modal-cabeca { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 16px 20px; border-bottom: 1px solid var(--borda); background: var(--carta-2); border-radius: var(--raio) var(--raio) 0 0; }
+.modal-cabeca h3 { font-size: 1.02rem; }
+.modal-cabeca button.fechar { width: 32px; height: 32px; border-radius: 50%; background: var(--coral-suave); color: var(--coral); font-weight: 800; font-size: 1rem; }
+.modal-corpo { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+.modal-corpo p.aviso-senha { margin: 0; font-size: .9rem; font-weight: 600; color: var(--tinta-2); }
+.modal-corpo p.erro-senha { margin: 0; font-size: .84rem; font-weight: 800; color: var(--coral); }
+
+textarea.editor-prompt { min-height: 340px; font-family: "JetBrains Mono", ui-monospace, monospace; font-size: .8rem; line-height: 1.55; font-weight: 400; }
+
+.modal-acoes { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.modal-acoes .espaco { flex: 1; }
+
+.botao-primario { padding: 10px 18px; border-radius: 12px; background: var(--sol); color: var(--sol-tinta); font-family: var(--fonte-titulo); font-weight: 600; font-size: .95rem; transition: transform .15s, background .2s; }
+.botao-primario:hover:not(:disabled) { transform: translateY(-1px); background: var(--sol-vivo); color: #fff; }
+.botao-primario:disabled { opacity: .6; cursor: wait; }
+
+.botao-fantasma { padding: 10px 16px; border-radius: 12px; border: 1.5px solid var(--borda); color: var(--tinta-2); font-weight: 800; font-size: .88rem; transition: border-color .2s, color .2s; }
+.botao-fantasma:hover { border-color: var(--coral); color: var(--coral); }
+
+/* ===== rodapé ===== */
+.rodape { text-align: center; padding: 26px 0 0; color: var(--tinta-2); font-size: .82rem; font-weight: 700; }
+.rodape .marca-rodape { display: inline-flex; align-items: center; gap: 8px; }
+.rodape .marca-rodape svg { width: 18px; height: 18px; }
+
+/* ===== toasts ===== */
+.area-toast { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 60; display: flex; flex-direction: column; gap: 8px; align-items: center; width: max-content; max-width: calc(100vw - 30px); }
+
+.toast { padding: 11px 18px; border-radius: 999px; background: var(--tinta); color: var(--papel); font-weight: 800; font-size: .88rem; box-shadow: var(--sombra); animation: subir .3s ease; max-width: 100%; text-align: center; }
+.toast.erro { background: var(--coral); color: #fff; }
+.toast.ok { background: var(--folha); color: #fff; }
+
+@keyframes subir { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+/* ===== animações de entrada ===== */
+.surgir { animation: surgir .55s cubic-bezier(.2, .7, .3, 1) both; }
+@keyframes surgir { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+.atraso-1 { animation-delay: .08s; }
+.atraso-2 { animation-delay: .18s; }
+
+/* ===== responsivo ===== */
+@media (max-width: 920px) {
+  .palco { grid-template-columns: 1fr; }
+  .topo { justify-content: center; text-align: center; }
+  .marca { justify-content: center; }
+}
+
+@media (max-width: 560px) {
+  body { font-size: 15px; }
+  .linha-dupla { grid-template-columns: 1fr; }
+  .troca-tema button span { display: none; }
+  .troca-tema button { padding: 7px 10px; }
+  .painel-corpo { padding: 16px; }
+  .rolagem-tabela { padding: 0 14px 16px; }
+  .resultado-solo { padding: 20px 16px; }
+  .rodape .marca-rodape svg { display: none; }
+}
+
+/* ===== impressão ===== */
+@media print {
+  body::before, .topo, .apresentacao .sub, .painel-formulario, .rodape, .ferramentas, .alternador, .area-toast { display: none !important; }
+  body { background: #fff; }
+  .palco { display: block; }
+  .painel { box-shadow: none; border: none; }
+  .painel-resultado { border: none; }
+  .rolagem-tabela { overflow: visible; padding: 0; }
+  table.plano { min-width: 0; font-size: 10.5pt; }
+  table.plano th { position: static; }
+}
+</style>
+</head>
+<body>
+<div class="corpo">
+
+  <header class="topo surgir">
+    <div class="marca">
+      <svg class="emblema" viewBox="0 0 48 48" role="img" aria-label="Logo PlanoBNCC">
+        <rect x="1.5" y="1.5" width="45" height="45" rx="11" fill="#F5A21B"/>
+        <g fill="#FFFFFF">
+          <circle cx="24" cy="17.5" r="5.5"/>
+          <path d="M9.5 29.5c4.5-3 9.5-3 14.5.5 5-3.5 10-3.5 14.5-.5v8.5c-4.5-3-9.5-3-14.5.5-5-3.5-10-3.5-14.5-.5z"/>
+        </g>
+        <g stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" fill="none">
+          <path d="M24 6.5v3"/><path d="M13.5 10.5l2.2 2.2"/><path d="M34.5 10.5l-2.2 2.2"/>
+          <path d="M9.5 19.5h3.2"/><path d="M35.3 19.5h3.2"/>
+        </g>
+      </svg>
+      <div class="nome">
+        <strong>PlanoBNCC</strong>
+        <span>Planejamento mensal · Educação Infantil</span>
+      </div>
+    </div>
+
+    <div class="acoes-topo">
+      <div class="troca-tema" role="radiogroup" aria-label="Tema da interface">
+        <button type="button" data-tema-opt="claro" role="radio" aria-checked="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="4.4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5 5l1.6 1.6M17.4 17.4L19 19M19 5l-1.6 1.6M6.6 17.4L5 19"/></svg>
+          <span>Claro</span>
+        </button>
+        <button type="button" data-tema-opt="escuro" role="radio" aria-checked="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a7 7 0 0 0 11 11z"/></svg>
+          <span>Escuro</span>
+        </button>
+        <button type="button" data-tema-opt="sistema" role="radio" aria-checked="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M9 20h6M12 16v4"/></svg>
+          <span>Sistema</span>
+        </button>
+      </div>
+
+      <button type="button" class="icone-redondo" id="btnAbrirPrompt" aria-label="Editar System Prompt Permanente" title="System Prompt Permanente">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.03-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.6 8.94a1.7 1.7 0 0 0-.34-1.87l-.06-.06A2 2 0 1 1 7.03 4.18l.06.06a1.7 1.7 0 0 0 1.87.34h.06A1.7 1.7 0 0 0 10.05 3V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.06a1.7 1.7 0 0 0 1.56 1.03H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51.9z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <section class="apresentacao surgir atraso-1">
+    <h1>Planeje o mês com <em>alegria</em> e com a BNCC</h1>
+    <p class="sub">Escolha o grupo, o mês e o ano — o planejamento mensal completo surge em formato de tabela, pronto para copiar, baixar ou imprimir. Anexar um calendário estudantil é opcional.</p>
+  </section>
+
+  <main class="palco">
+
+    <!-- ===== painel do formulário ===== -->
+    <section class="painel painel-formulario surgir atraso-1" aria-label="Gerar planejamento">
+      <div class="painel-cabeca">
+        <h2><span class="bola"></span>Gerar planejamento</h2>
+      </div>
+      <div class="painel-corpo">
+
+        <div class="campo">
+          <label id="lblGrupo">Grupo</label>
+          <div class="segmentado" role="radiogroup" aria-labelledby="lblGrupo" id="seletorGrupo">
+            <button type="button" data-grupo="1" role="radio" aria-checked="false">Grupo 1</button>
+            <button type="button" data-grupo="2" role="radio" aria-checked="false">Grupo 2</button>
+            <button type="button" data-grupo="3" role="radio" aria-checked="true">Grupo 3</button>
+          </div>
+          <span class="prefixo-codigo" id="chipPrefixo">Códigos com o prefixo EI03</span>
+        </div>
+
+        <div class="linha-dupla">
+          <div class="campo">
+            <label for="campoMes">Mês</label>
+            <select id="campoMes"></select>
+          </div>
+          <div class="campo">
+            <label for="campoAno">Ano</label>
+            <input type="number" id="campoAno" min="2024" max="2035" step="1" value="2026">
+          </div>
+        </div>
+
+        <div class="campo">
+          <label for="campoModelo">Modelo de IA</label>
+          <select id="campoModelo">
+            <option value="gemini-flash-latest">gemini-flash-latest</option>
+            <option value="gemini-flash-lite-latest" selected>gemini-flash-lite-latest (padrão)</option>
+            <option value="gemini-3-flash-preview">gemini-3-flash-preview</option>
+            <option value="gemini-3.1-flash-lite">gemini-3.1-flash-lite</option>
+            <option value="gemini-3.5-flash">gemini-3.5-flash</option>
+            <option value="gemini-3.6-flash">gemini-3.6-flash</option>
+            <option value="gemini-3.7-flash">gemini-3.7-flash</option>
+            <option value="gemini-3.8-flash">gemini-3.8-flash</option>
+            <option value="gemini-4-hydrogen">gemini-4-hydrogen</option>
+          </select>
+        </div>
+
+        <div class="campo">
+          <label>Calendário estudantil <small>(opcional)</small></label>
+          <div class="zona-arquivo" id="zonaArquivo" tabindex="0" role="button"
+               aria-label="Adicionar calendário: PDF, imagem, TXT ou MD">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5"/><path d="M4 15v3a2.5 2.5 0 0 0 2.5 2.5h11A2.5 2.5 0 0 0 20 18v-3"/></svg>
+            <strong>Adicionar calendário</strong>
+            <span>PDF · imagem (PNG, JPG, WEBP) · TXT · MD</span>
+          </div>
+          <input type="file" id="campoArquivo" multiple class="input-arquivo" tabindex="-1"
+                 accept=".pdf,.png,.jpg,.jpeg,.webp,.txt,.md,application/pdf,image/png,image/jpeg,image/webp,text/plain">
+          <div class="lista-arquivos" id="listaArquivos"></div>
+          <span class="dica-campo">Sem anexo, o planejamento considera os dias letivos habituais. PDFs até 4 MB no total; imagens são otimizadas automaticamente.</span>
+        </div>
+
+        <div class="campo">
+          <label for="campoObs">Observações <small>(opcional)</small></label>
+          <textarea id="campoObs" rows="3" placeholder="Ex.: priorizar atividades em grupo, datas comemorativas da escola…"></textarea>
+        </div>
+
+        <button type="button" class="botao-gerar" id="btnGerar">
+          <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="4.6"/><path d="M12 2.8v2M12 19.2v2M2.8 12h2M19.2 12h2M5.2 5.2l1.5 1.5M17.3 17.3l1.5 1.5M18.8 5.2l-1.5 1.5M6.7 17.3l-1.5 1.5"/></svg>
+          <span>Gerar planejamento</span>
+        </button>
+
+      </div>
+    </section>
+
+    <!-- ===== painel do resultado ===== -->
+    <section class="painel painel-resultado surgir atraso-2" aria-label="Planejamento gerado">
+      <div class="painel-cabeca">
+        <h2><span class="bola folha"></span>Planejamento gerado</h2>
+        <div class="alternador" role="radiogroup" aria-label="Modo de visualização" id="alternadorVisao">
+          <button type="button" data-visao="renderizado" role="radio" aria-checked="true">Renderizado</button>
+          <button type="button" data-visao="markdown" role="radio" aria-checked="false">Markdown</button>
+        </div>
+      </div>
+
+      <div class="painel-corpo" id="corpoResultado">
+        <div class="etiquetas" id="etiquetas" hidden>
+          <span class="etiqueta mes" id="etiquetaMes"></span>
+          <span class="etiqueta grupo" id="etiquetaGrupo"></span>
+          <span class="etiqueta modelo" id="etiquetaModelo"></span>
+        </div>
+        <div class="ferramentas" id="ferramentas" hidden>
+          <button type="button" id="btnCopiar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M5 15H4.5A2.5 2.5 0 0 1 2 12.5v-8A2.5 2.5 0 0 1 4.5 2h8A2.5 2.5 0 0 1 15 4.5V5"/></svg>
+            Copiar Markdown
+          </button>
+          <button type="button" id="btnBaixarMd">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5"/><path d="M4 17v2.5A2.5 2.5 0 0 0 6.5 22h11a2.5 2.5 0 0 0 2.5-2.5V17"/></svg>
+            Baixar .md
+          </button>
+          <button type="button" id="btnBaixarHtml">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5a2 2 0 0 0 2 2h1M16 3h1a2 2 0 0 1 2 2v5a2 2 0 0 0 2 2 2 2 0 0 0-2 2v5a2 2 0 0 1-2 2h-1"/></svg>
+            Baixar HTML
+          </button>
+          <button type="button" id="btnImprimir">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3.5h12V9"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="7" rx="1"/></svg>
+            Imprimir
+          </button>
+        </div>
+
+        <div id="conteudoResultado"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="rodape">
+    <div class="marca-rodape">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="1.5" y="1.5" width="45" height="45" rx="11" fill="#F5A21B"/><circle cx="24" cy="18" r="6" fill="#FFF"/><path d="M11 30c4-2.6 8.5-2.6 13 .4 4.5-3 9-3 13-.4v8c-4-2.6-8.5-2.6-13 .4-4.5-3-9-3-13-.4z" fill="#FFF"/></svg>
+      <span>PlanoBNCC · planejamentos mensais alinhados à BNCC para a Educação Infantil</span>
+    </div>
+    <p>Seus arquivos são usados apenas para gerar o planejamento — nada é armazenado em servidor próprio.</p>
+  </footer>
+
+</div>
+
+<!-- ===== modal: System Prompt Permanente ===== -->
+<dialog class="modal" id="modalPrompt">
+  <div class="modal-cabeca">
+    <h3>System Prompt Permanente</h3>
+    <button type="button" class="fechar" id="btnFecharModal" aria-label="Fechar">×</button>
+  </div>
+
+  <div class="modal-corpo" id="etapaSenha">
+    <p class="aviso-senha">Esta área é protegida por senha. A senha é definida nas variáveis de ambiente do servidor e não existem dicas sobre ela.</p>
+    <div class="campo">
+      <label for="campoSenha">Senha de acesso</label>
+      <input type="password" id="campoSenha" autocomplete="off" spellcheck="false">
+    </div>
+    <p class="erro-senha" id="erroSenha" hidden>Senha incorreta.</p>
+    <div class="modal-acoes">
+      <button type="button" class="botao-fantasma" id="btnCancelarSenha">Cancelar</button>
+      <span class="espaco"></span>
+      <button type="button" class="botao-primario" id="btnDesbloquear">Desbloquear</button>
+    </div>
+  </div>
+
+  <div class="modal-corpo" id="etapaEditor" hidden>
+    <p class="aviso-senha">Este texto é enviado ao modelo em toda geração, junto com o grupo, o mês e o calendário anexado.</p>
+    <textarea class="editor-prompt" id="campoPrompt" spellcheck="false"></textarea>
+    <div class="modal-acoes">
+      <button type="button" class="botao-fantasma" id="btnRestaurar">Restaurar padrão</button>
+      <span class="espaco"></span>
+      <button type="button" class="botao-primario" id="btnSalvarPrompt">Salvar</button>
+    </div>
+  </div>
+</dialog>
+
+<div class="area-toast" id="areaToast" aria-live="polite"></div>
+
+<script type="text/plain" id="prompt-padrao">Com base no PLANEJAMENTO MENSAL – EDUCAÇÃO INFANTIL (GRUPO 1 / GRUPO 2 / GRUPO 3), gere um semelhante ao do modelo exemplo fornecida para um novo mês e forneça em bloco de código com formatação markdown.
+Somente usar eixo temático que consta na lista do system prompt.
+
+REGRA CRÍTICA DE FORMATO:
+Retorne EXCLUSIVAMENTE a tabela Markdown do planejamento. NÃO inclua nenhum tipo de texto de introdução, saudações, observações, notas de rodapé ou parágrafos explicativos fora da tabela. A resposta deve conter APENAS e TÃO SOMENTE a tabela markdown iniciando na primeira linha com '| DATA | EIXO TEMÁTICO | ...'.
+
+Modelo: 
+| DATA | EIXO TEMÁTICO | CÓDIGOS | DETALHAMENTO DAS ATIVIDADES DE ACORDO COM OS CÓDIGOS E CAMPOS DE EXPERIÊNCIAS TRABALHADOS |
+| :--- | :--- | :--- | :--- |
+| **01/06** | *Relações temporais<br>*Números | *EI02ET06<br>*EI02ET07 | *Trabalhar conceitos básicos de tempo (antes, depois, hoje, amanhã) em roda.<br>*Contar oralmente os colegas e objetos cotidianos da sala. |
+
+REGRA:
+Obs: para a aba "DATA" varie na utilização dos códigos quantidades por data de 1 a 4 em ordem aleatória com a seguinte proporção 1 (2%), 2 (20%), 3 (78%), 4 (10%).
+
+#System prompt referentes os bimestres correlacionados os meses:
+
+#1B
+Esses são os eixos temáticos e os códigos a serem utilizados com atividades sendo geradas com base nas referências de objetivos toda vez que um mês referente ao primeiro bimestre for solicitado (você deve identificar o mês e saber a qual bimestre ele corresponde):
+
+{
+  "documento": "ORIENTAÇÕES CURRICULARES BNCC POR BIMESTRE",
+  "secretaria": "Prefeitura de Campos - Secretaria Municipal de Educação, Ciência e Tecnologia",
+  "etapa": "EDUCAÇÃO INFANTIL",
+  "grupo": "GRUPO 3 / G3 - CRIANÇAS BEM PEQUENAS",
+  "bimestre": "1º BIMESTRE",
+  "campos_de_experiencia": [
+    {
+      "campo": "ESCUTA, FALA, PENSAMENTO E IMAGINAÇÃO",
+      "eixo_tematico": [
+        "Expressão oral: sentimentos, escolhas, opiniões",
+        "Leitura de Histórias: manuseio, questionamentos, criação, recontagem",
+        "Nome",
+        "Patrimônio Histórico Cultural de Campos dos Goytacazes (lendas municipais, visitação...)"
+      ],
+      "codigos_bncc": [
+        "EI02EF01",
+        "EI02EF03",
+        "EI02EF05",
+        "EI02EF09"
+      ],
+      "objetivos_bncc": [
+        "(EI02EF01) Dialogar com crianças e adultos, expressando seus desejos, necessidades, sentimentos e opiniões;",
+        "(EI02EF03) Demonstrar interesse e atenção ao ouvir a leitura de histórias e outros textos, diferenciando escrita de ilustrações, e acompanhando, com orientação do adulto-leitor, a direção da leitura (de cima para baixo, da esquerda para a direita).",
+        "(EI02EF05) Relatar experiências e fatos acontecidos, histórias ouvidas, filmes ou peças teatrais assistidas etc;",
+        "(EI02EF09) Manusear diferentes instrumentos e suportes de escrita para desenhar, traçar letras e outros sinais gráficos;"
+      ]
+    },
+    {
+      "campo": "CORPO, GESTOS E MOVIMENTOS",
+      "eixo_tematico": [
+        "Psicomotricidade",
+        "A Orientação Espacial e o corpo",
+        "Expressão corporal",
+        "Equilíbrio",
+        "Coordenação motora fina"
+      ],
+      "codigos_bncc": [
+        "EI02CG01",
+        "EI02CG02",
+        "EI02CG03",
+        "EI02CG05"
+      ],
+      "objetivos_bncc": [
+        "(EI02CG01) Apropriar-se de gestos e movimentos de sua cultura no cuidado de si e nos jogos e brincadeiras;",
+        "(EI02CG02) Deslocar seu corpo no espaço, orientando-se por noções como em frente, atrás, no alto, embaixo, dentro, fora etc., ao se envolver em brincadeiras e atividades de diferentes naturezas;",
+        "(EI02CG03) Explorar formas de deslocamento no espaço (pular, saltar, dançar), combinando movimentos e seguindo orientações.",
+        "(EI02CG05) Desenvolver progressivamente as habilidades manuais, adquirindo controle para desenhar, pintar, rasgar, folhear, dentre outros."
+      ]
+    },
+    {
+      "campo": "O EU, O OUTRO E O NÓS",
+      "eixo_tematico": [
+        "Socialização / afetividade",
+        "Identidade (EU)",
+        "Cooperação / autonomia",
+        "Interação social",
+        "Expressão corporal e oral",
+        "Regras de convívio social / valores",
+        "Respeito à diversidade"
+      ],
+      "codigos_bncc": [
+        "EI02EO01",
+        "EI02EO02",
+        "EI02EO03",
+        "EI02EO04",
+        "EI02EO05",
+        "EI02EO06",
+        "EI02EO07"
+      ],
+      "objetivos_bncc": [
+        "(EI02EO01) Demonstrar atitudes de cuidado e solidariedade na interação com crianças e adultos;",
+        "(EI02EO02) Demonstrar imagem positiva de si e confiança em sua capacidade para enfrentar dificuldades e desafios;",
+        "(EI02EO03) Compartilhar os objetos e os espaços com crianças da mesma faixa etária e adultos;",
+        "(EI02EO04) Comunicar-se com os colegas e os adultos, buscando compreendê-los e fazendo-se compreender;",
+        "(EI02EO05) Perceber que as pessoas têm características físicas diferentes, respeitando essas diferenças;",
+        "(EI02EO06) Respeitar regras básicas de convívio social nas interações e brincadeiras;",
+        "(EI02EO07) Resolver conflitos nas interações e brincadeiras, com a orientação de um adulto."
+      ]
+    },
+    {
+      "campo": "TRAÇOS, SONS, CORES E FORMAS",
+      "eixo_tematico": [
+        "Sons: exploração, verbalização e criação"
+      ],
+      "codigos_bncc": [
+        "EI02TS01"
+      ],
+      "objetivos_bncc": [
+        "(EI02TS01) Criar sons com materiais, objetos e instrumentos musicais, para acompanhar diversos ritmos de música."
+      ]
+    },
+    {
+      "campo": "ESPAÇOS, TEMPOS, QUANTIDADES, RELAÇÕES E TRANSFORMAÇÕES",
+      "eixo_tematico": [
+        "Percepção tátil (forma, tamanho, espessura, textura, peso, consistência e temperatura)",
+        "Relações espaciais",
+        "Percepção visual (forma, cor, tamanho e espessura)"
+      ],
+      "codigos_bncc": [
+        "EI02ET01",
+        "EI02ET04",
+        "EI02ET05"
+      ],
+      "objetivos_bncc": [
+        "(EI02ET01) Explorar e descrever semelhanças e diferenças entre as características e propriedades dos objetos (textura, massa, tamanho);",
+        "(EI02ET04) Identificar relações espaciais (dentro e fora, em cima, embaixo, acima, abaixo, entre e do lado) e temporais (antes, durante e depois);",
+        "(EI02ET05) Classificar objetos, considerando determinado atributo (tamanho, peso, cor, forma etc.)."
+      ]
+    }
+  ]
+}
+
+#2B
+Esses são os eixos temáticos e os códigos a serem utilizados com atividades sendo geradas com base nas referências de objetivos toda vez que um mês referente ao segundo bimestre for solicitado (você deve identificar o mês e saber a qual bimestre ele corresponde):
+{
+  "documento": "ORIENTAÇÕES CURRICULARES BNCC POR BIMESTRE",
+  "secretaria": "Prefeitura de Campos - Secretaria Municipal de Educação, Ciência e Tecnologia",
+  "etapa": "EDUCAÇÃO INFANTIL",
+  "grupo": "GRUPO 3 / G3 - CRIANÇAS BEM PEQUENAS",
+  "bimestre": "2º BIMESTRE",
+  "campos_de_experiencia": [
+    {
+      "campo": "ESCUTA, FALA, PENSAMENTO E IMAGINAÇÃO",
+      "eixo_tematico": [
+        "Expressão oral: sentimentos, escolhas, opiniões",
+        "Leitura de Histórias: manuseio, questionamentos, criação, recontagem",
+        "Nome",
+        "Escrita: desenho do nome e traços das letras do alfabeto"
+      ],
+      "codigos_bncc": [
+        "EI02EF01",
+        "EI02EF03",
+        "EI02EF04",
+        "EI02EF07",
+        "EI02EF09"
+      ],
+      "objetivos_bncc": [
+        "(EI02EF01) Dialogar com crianças e adultos, expressando seus desejos, necessidades, sentimentos e opiniões;",
+        "(EI02EF03) Demonstrar interesse e atenção ao ouvir a leitura de histórias e outros textos, diferenciando escrita de ilustrações, e acompanhando, com orientação do adulto-leitor, a direção da leitura (de cima para baixo, da esquerda para a direita);",
+        "(EI02EF04) Formular e responder perguntas sobre fatos da história narrada, identificando cenários, personagens e principais acontecimentos;",
+        "(EI02EF07) Manusear diferentes portadores textuais, demonstrando reconhecer seus usos sociais;",
+        "(EI02EF09) Manusear diferentes instrumentos e suportes de escrita para desenhar, traçar letras e outros sinais gráficos."
+      ]
+    },
+    {
+      "campo": "CORPO, GESTOS E MOVIMENTOS",
+      "eixo_tematico": [
+        "Psicomotricidade",
+        "A Orientação Espacial e o corpo",
+        "Expressão corporal",
+        "Equilíbrio",
+        "Coordenação motora grossa",
+        "Higiene pessoal",
+        "Coordenação motora fina"
+      ],
+      "codigos_bncc": [
+        "EI02CG01",
+        "EI02CG02",
+        "EI02CG03",
+        "EI02CG04",
+        "EI02CG05"
+      ],
+      "objetivos_bncc": [
+        "(EI02CG01) Apropriar-se de gestos e movimentos de sua cultura no cuidado de si e nos jogos e brincadeiras;",
+        "(EI02CG02) Deslocar seu corpo no espaço, orientando-se por noções como em frente, atrás, no alto, embaixo, dentro, fora etc., ao se envolver em brincadeiras e atividades de diferentes naturezas;",
+        "(EI02CG03) Explorar formas de deslocamento no espaço (pular, saltar, dançar), combinando movimentos e seguindo orientações;",
+        "(EI02CG04) Demonstrar progressiva independência no cuidado do seu corpo.",
+        "(EI02CG05) Desenvolver progressivamente as habilidades manuais, adquirindo controle para desenhar, pintar, rasgar, folhear, dentre outros."
+      ]
+    },
+    {
+      "campo": "O EU, O OUTRO E O NÓS",
+      "eixo_tematico": [
+        "Socialização / afetividade",
+        "Identidade (EU)",
+        "Cooperação / autonomia",
+        "Interação social",
+        "Expressão corporal e oral",
+        "Regras de convívio social / valores",
+        "Respeito à diversidade"
+      ],
+      "codigos_bncc": [
+        "EI02EO01",
+        "EI02EO02",
+        "EI02EO03",
+        "EI02EO04",
+        "EI02EO05",
+        "EI02EO06",
+        "EI02EO07"
+      ],
+      "objetivos_bncc": [
+        "(EI02EO01) Demonstrar atitudes de cuidado e solidariedade na interação com crianças e adultos;",
+        "(EI02EO02) Demonstrar imagem positiva de si e confiança em sua capacidade para enfrentar dificuldades e desafios;",
+        "(EI02EO03) Compartilhar os objetos e os espaços com crianças da mesma faixa etária e adultos;",
+        "(EI02EO04) Comunicar-se com os colegas e os adultos, buscando compreendê-los e fazendo-se compreender;",
+        "(EI02EO05) Perceber que as pessoas têm características físicas diferentes, respeitando essas diferenças;",
+        "(EI02EO06) Respeitar regras básicas de convívio social nas interações e brincadeiras;",
+        "(EI02EO07) Resolver conflitos nas interações e brincadeiras, com a orientação de um adulto."
+      ]
+    },
+    {
+      "campo": "TRAÇOS, SONS, CORES E FORMAS",
+      "eixo_tematico": [
+        "Sons: exploração, verbalização e criação",
+        "Cores (primárias e secundárias)",
+        "Artes: exploração e manuseio"
+      ],
+      "codigos_bncc": [
+        "EI02TS01",
+        "EI02TS02",
+        "EI02TS03"
+      ],
+      "objetivos_bncc": [
+        "(EI02TS01) Criar sons com materiais, objetos e instrumentos musicais, para acompanhar diversos ritmos de música;",
+        "(EI02TS02) Utilizar materiais variados com possibilidades de manuseio (argila, massa de modelar), explorando cores, texturas, superfícies, planos, formas e volumes ao criar objetos tridimensionais;",
+        "(EI02TS03) Utilizar diferentes fontes sonoras disponíveis no ambiente em brincadeiras cantadas, canções, músicas e melodias."
+      ]
+    },
+    {
+      "campo": "ESPAÇOS, TEMPOS, QUANTIDADES, RELAÇÕES E TRANSFORMAÇÕES",
+      "eixo_tematico": [
+        "Percepção tátil (forma, tamanho, espessura, textura, peso, consistência e temperatura)",
+        "Relações espaciais",
+        "Percepção visual (forma, cor, tamanho e espessura)",
+        "Relações temporais",
+        "Números"
+      ],
+      "codigos_bncc": [
+        "EI02ET01",
+        "EI02ET04",
+        "EI02ET05",
+        "EI02ET06",
+        "EI02ET07",
+        "EI02ET08"
+      ],
+      "objetivos_bncc": [
+        "(EI02ET01) Explorar e descrever semelhanças e diferenças entre as características e propriedades dos objetos (textura, massa, tamanho);",
+        "(EI02ET04) Identificar relações espaciais (dentro e fora, em cima, embaixo, acima, abaixo, entre e do lado) e temporais (antes, durante e depois);",
+        "(EI02ET05) Classificar objetos, considerando determinado atributo (tamanho, peso, cor, forma etc.);",
+        "(EI02ET06) Utilizar conceitos básicos de tempo (agora, antes, durante, depois, ontem, hoje, amanhã, lento, rápido, depressa, devagar);",
+        "(EI02ET07) Contar oralmente, objetos, pessoas, livros, etc, em contextos diversos;",
+        "(EI02ET08) Registrar com números a quantidade de crianças (meninas e meninos, presentes e ausentes) e a quantidade de objetos da mesma natureza boneca, bolas, livros, etc."
+      ]
+    }
+  ]
+}
+
+#3B
+Esses são os eixos temáticos e os códigos a serem utilizados com atividades sendo geradas com base nas referências de objetivos toda vez que um mês referente ao terceiro bimestre for solicitado (você deve identificar o mês e saber a qual bimestre ele corresponde):
+{
+  "documento": "ORIENTAÇÕES CURRICULARES BNCC POR BIMESTRE",
+  "secretaria": "Prefeitura de Campos - Secretaria Municipal de Educação, Ciência e Tecnologia",
+  "etapa": "EDUCAÇÃO INFANTIL",
+  "grupo": "GRUPO 3 / G3 - CRIANÇAS BEM PEQUENAS",
+  "bimestre": "3º BIMESTRE",
+  "campos_de_experiencia": [
+    {
+      "campo": "ESCUTA, FALA, PENSAMENTO E IMAGINAÇÃO",
+      "eixo_tematico": [
+        "Expressão oral: sentimentos, escolhas, opiniões",
+        "Leitura de Histórias: manuseio, questionamentos, criação, recontagem",
+        "Nome",
+        "Escrita: desenho do nome e traços das letras do alfabeto",
+        "Criação e reprodução oral: rimas e aliterações em músicas",
+        "Patrimônio Histórico Cultural de Campos dos Goytacazes (lendas municipais, visitação...)"
+      ],
+      "codigos_bncc": [
+        "EI02EF01",
+        "EI02EF02",
+        "EI02EF03",
+        "EI02EF04",
+        "EI02EF05",
+        "EI02EF06",
+        "EI02EF07",
+        "EI02EF08",
+        "EI02EF09"
+      ],
+      "objetivos_bncc": [
+        "(EI02EF01) Dialogar com crianças e adultos, expressando seus desejos, necessidades, sentimentos e opiniões;",
+        "(EI02EF02) Identificar e criar diferentes sons e reconhecer rimas e aliterações em cantigas de roda e textos poéticos;",
+        "(EI02EF03) Demonstrar interesse e atenção ao ouvir a leitura de histórias e outros textos, diferenciando escrita de ilustrações, e acompanhando, com orientação do adulto-leitor, a direção da leitura (de cima para baixo, da esquerda para a direita);",
+        "(EI02EF04) Formular e responder perguntas sobre fatos da história narrada, identificando cenários, personagens e principais acontecimentos;",
+        "(EI02EF05) Relatar experiências e fatos acontecidos, histórias ouvidas, filmes ou peças teatrais assistidas etc;",
+        "(EI02EF06) Criar e contar histórias oralmente, com base em imagens ou temas sugeridos;",
+        "(EI02EF07) Manusear diferentes portadores textuais, demonstrando reconhecer seus usos sociais;",
+        "(EI02EF08) Manusear textos e participar de situações de escuta para ampliar seu contato com diferentes gêneros textuais (parlendas, histórias de aventura, tirinhas, cartazes de sala, cardápios, notícias etc.).",
+        "(EI02EF09) Manusear diferentes instrumentos e suportes de escrita para desenhar, traçar letras e outros sinais gráficos;"
+      ]
+    },
+    {
+      "campo": "CORPO, GESTOS E MOVIMENTOS",
+      "eixo_tematico": [
+        "Psicomotricidade",
+        "A Orientação Espacial e o corpo",
+        "Expressão corporal",
+        "Equilíbrio",
+        "Coordenação motora grossa",
+        "Higiene pessoal",
+        "Coordenação motora fina"
+      ],
+      "codigos_bncc": [
+        "EI02CG01",
+        "EI02CG02",
+        "EI02CG03",
+        "EI02CG04",
+        "EI02CG05"
+      ],
+      "objetivos_bncc": [
+        "(EI02CG01) Apropriar-se de gestos e movimentos de sua cultura no cuidado de si e nos jogos e brincadeiras;",
+        "(EI02CG02) Deslocar seu corpo no espaço, orientando-se por noções como em frente, atrás, no alto, embaixo, dentro, fora etc., ao se envolver em brincadeiras e atividades de diferentes naturezas;",
+        "(EI02CG03) Explorar formas de deslocamento no espaço (pular, saltar, dançar), combinando movimentos e seguindo orientações;",
+        "(EI02CG04) Demonstrar progressiva independência no cuidado do seu corpo;",
+        "(EI02CG05) Desenvolver progressivamente as habilidades manuais, adquirindo controle para desenhar, pintar, rasgar, folhear, dentre outros."
+      ]
+    },
+    {
+      "campo": "O EU, O OUTRO E O NÓS",
+      "eixo_tematico": [
+        "Socialização / afetividade",
+        "Identidade (EU)",
+        "Cooperação / autonomia",
+        "Interação social",
+        "Expressão corporal e oral",
+        "Regras de convívio social / valores",
+        "Respeito à diversidade"
+      ],
+      "codigos_bncc": [
+        "EI02EO01",
+        "EI02EO02",
+        "EI02EO03",
+        "EI02EO04",
+        "EI02EO05",
+        "EI02EO06",
+        "EI02EO07"
+      ],
+      "objetivos_bncc": [
+        "(EI02EO01) Demonstrar atitudes de cuidado e solidariedade na interação com crianças e adultos;",
+        "(EI02EO02) Demonstrar imagem positiva de si e confiança em sua capacidade para enfrentar dificuldades e desafios;",
+        "(EI02EO03) Compartilhar os objetos e os espaços com crianças da mesma faixa etária e adultos;",
+        "(EI02EO04) Comunicar-se com os colegas e os adultos, buscando compreendê-los e fazendo-se compreender;",
+        "(EI02EO05) Perceber que as pessoas têm características físicas diferentes, respeitando essas diferenças;",
+        "(EI02EO06) Respeitar regras básicas de convívio social nas interações e brincadeiras;",
+        "(EI02EO07) Resolver conflitos nas interações e brincadeiras, com a orientação de um adulto."
+      ]
+    },
+    {
+      "campo": "TRAÇOS, SONS, CORES E FORMAS",
+      "eixo_tematico": [
+        "Sons: exploração, verbalização e criação",
+        "Cores (primárias e secundárias)",
+        "Artes: exploração e manuseio"
+      ],
+      "codigos_bncc": [
+        "EI02TS01",
+        "EI02TS02",
+        "EI02TS03"
+      ],
+      "objetivos_bncc": [
+        "(EI02TS01) Criar sons com materiais, objetos e instrumentos musicais, para acompanhar diversos ritmos de música;",
+        "(EI02TS02) Utilizar materiais variados com possibilidades de manuseio (argila, massa de modelar), explorando cores, texturas, superfícies, planos, formas e volumes ao criar objetos tridimensionais;",
+        "(EI02TS03) Utilizar diferentes fontes sonoras disponíveis no ambiente em brincadeiras cantadas, canções, músicas e melodias."
+      ]
+    },
+    {
+      "campo": "ESPAÇOS, TEMPOS, QUANTIDADES, RELAÇÕES E TRANSFORMAÇÕES",
+      "eixo_tematico": [
+        "Percepção tátil (forma, tamanho, espessura, textura, peso, consistência e temperatura)",
+        "Relações espaciais",
+        "Percepção visual (forma, cor, tamanho e espessura)",
+        "Relações temporais",
+        "Números",
+        "Fenômenos da natureza: sol, vento, chuva",
+        "Cuidado: plantas, animais e ambientes"
+      ],
+      "codigos_bncc": [
+        "EI02ET01",
+        "EI02ET02",
+        "EI02ET03",
+        "EI02ET04",
+        "EI02ET05"
+      ],
+      "objetivos_bncc": [
+        "(EI02ET01) Explorar e descrever semelhanças e diferenças entre as características e propriedades dos objetos (textura, massa, tamanho);",
+        "(EI02ET02) Observar, relatar e descrever incidentes do cotidiano e fenômenos naturais (luz solar, vento, chuva etc.);",
+        "(EI02ET03) Compartilhar, com outras crianças, situações de cuidado de plantas e animais nos espaços da instituição e fora dela;",
+        "(EI02ET04) Identificar relações espaciais (dentro e fora, em cima, embaixo, acima, abaixo, entre e do lado) e temporais (antes, durante e depois);",
+        "(EI02ET05) Classificar objetos, considerando determinado atributo (tamanho, peso, cor, forma etc.)."
+      ]
+    }
+  ]
+}
+
+#4B
+Esses são os eixos temáticos e os códigos a serem utilizados com atividades sendo geradas com base nas referências de objetivos toda vez que um mês referente ao quarto bimestre for solicitado (você deve identificar o mês e saber a qual bimestre ele corresponde):
+{
+  "documento": "ORIENTAÇÕES CURRICULARES BNCC POR BIMESTRE",
+  "secretaria": "Prefeitura de Campos - Secretaria Municipal de Educação, Ciência e Tecnologia",
+  "etapa": "EDUCAÇÃO INFANTIL",
+  "grupo": "GRUPO 3 / G3 - CRIANÇAS BEM PEQUENAS",
+  "bimestre": "4º BIMESTRE",
+  "campos_de_experiencia": [
+    {
+      "campo": "ESCUTA, FALA, PENSAMENTO E IMAGINAÇÃO",
+      "eixo_tematico": [
+        "Expressão oral: sentimentos, escolhas, opiniões",
+        "Leitura de Histórias: manuseio, questionamentos, criação, recontagem",
+        "Nome",
+        "Escrita: desenho do nome e traços das letras do alfabeto",
+        "Criação e reprodução oral: rimas e aliterações em músicas"
+      ],
+      "codigos_bncc": [
+        "EI02EF01",
+        "EI02EF02",
+        "EI02EF03",
+        "EI02EF04",
+        "EI02EF05",
+        "EI02EF06",
+        "EI02EF07",
+        "EI02EF08",
+        "EI02EF09"
+      ],
+      "objetivos_bncc": [
+        "(EI02EF01) Dialogar com crianças e adultos, expressando seus desejos, necessidades, sentimentos e opiniões;",
+        "(EI02EF02) Identificar e criar diferentes sons e reconhecer rimas e aliterações em cantigas de roda e textos poéticos;",
+        "(EI02EF03) Demonstrar interesse e atenção ao ouvir a leitura de histórias e outros textos, diferenciando escrita de ilustrações, e acompanhando, com orientação do adulto-leitor, a direção da leitura (de cima para baixo, da esquerda para a direita);",
+        "(EI02EF04) Formular e responder perguntas sobre fatos da história narrada, identificando cenários, personagens e principais acontecimentos;",
+        "(EI02EF05) Relatar experiências e fatos acontecidos, histórias ouvidas, filmes ou peças teatrais assistidas etc;",
+        "(EI02EF06) Criar e contar histórias oralmente, com base em imagens ou temas sugeridos;",
+        "(EI02EF07) Manusear diferentes portadores textuais, demonstrando reconhecer seus usos sociais;",
+        "(EI02EF08) Manusear textos e participar de situações de escuta para ampliar seu contato com diferentes gêneros textuais (parlendas, histórias de aventura, tirinhas, cartazes de sala, cardápios, notícias etc.).",
+        "(EI02EF09) Manusear diferentes instrumentos e suportes de escrita para desenhar, traçar letras e outros sinais gráficos;"
+      ]
+    },
+    {
+      "campo": "CORPO, GESTOS E MOVIMENTOS",
+      "eixo_tematico": [
+        "Psicomotricidade;",
+        "A Orientação Espacial e o corpo;",
+        "Expressão corporal;",
+        "Equilíbrio;",
+        "Coordenação motora; grossa;",
+        "Higiene pessoal;",
+        "Coordenação motora fina."
+      ],
+      "codigos_bncc": [
+        "EI02CG01",
+        "EI02CG02",
+        "EI02CG03",
+        "EI02CG04",
+        "EI02CG05"
+      ],
+      "objetivos_bncc": [
+        "(EI02CG01) Apropriar-se de gestos e movimentos de sua cultura no cuidado de si e nos jogos e brincadeiras;",
+        "(EI02CG02) Deslocar seu corpo no espaço, orientando-se por noções como em frente, atrás, no alto, embaixo, dentro, fora etc., ao se envolver em brincadeiras e atividades de diferentes naturezas;",
+        "(EI02CG03) Explorar formas de deslocamento no espaço (pular, saltar, dançar), combinando movimentos e seguindo orientações;",
+        "(EI02CG04) Demonstrar progressiva independência no cuidado do seu corpo;",
+        "(EI02CG05) Desenvolver progressivamente as habilidades manuais, adquirindo controle para desenhar, pintar, rasgar, folhear, dentre outros."
+      ]
+    },
+    {
+      "campo": "O EU, O OUTRO E O NÓS",
+      "eixo_tematico": [
+        "Socialização / afetividade;",
+        "Identidade (EU);",
+        "Cooperação / autonomia;",
+        "Interação social;",
+        "Expressão corporal e oral;",
+        "Regras de convívio social / valores;",
+        "Respeito à diversidade."
+      ],
+      "codigos_bncc": [
+        "EI02EO01",
+        "EI02EO02",
+        "EI02EO03",
+        "EI02EO04",
+        "EI02EO05",
+        "EI02EO06",
+        "EI02EO07"
+      ],
+      "objetivos_bncc": [
+        "(EI02EO01) Demonstrar atitudes de cuidado e solidariedade na interação com crianças e adultos;",
+        "(EI02EO02) Demonstrar imagem positiva de si e confiança em sua capacidade para enfrentar dificuldades e desafios;",
+        "(EI02EO03) Compartilhar os objetos e os espaços com crianças da mesma faixa etária e adultos;",
+        "(EI02EO04) Comunicar-se com os colegas e os adultos, buscando compreendê-los e fazendo-se compreender;",
+        "(EI02EO05) Perceber que as pessoas têm características físicas diferentes, respeitando essas diferenças;",
+        "(EI02EO06) Respeitar regras básicas de convívio social nas interações e brincadeiras;",
+        "(EI02EO07) Resolver conflitos nas interações e brincadeiras, com a orientação de um adulto."
+      ]
+    },
+    {
+      "campo": "TRAÇOS, SONS, CORES E FORMAS",
+      "eixo_tematico": [
+        "Sons: exploração, verbalização e criação;",
+        "Cores (primárias e secundárias);",
+        "Artes: exploração e manuseio."
+      ],
+      "codigos_bncc": [
+        "EI02TS01",
+        "EI02TS02",
+        "EI02TS03"
+      ],
+      "objetivos_bncc": [
+        "(EI02TS01) Criar sons com materiais, objetos e instrumentos musicais, para acompanhar diversos ritmos de música;",
+        "(EI02TS02) Utilizar materiais variados com possibilidades de manuseio (argila, massa de modelar), explorando cores, texturas, superfícies, planos, formas e volumes ao criar objetos tridimensionais;",
+        "(EI02TS03) Utilizar diferentes fontes sonoras disponíveis no ambiente em brincadeiras cantadas, canções, músicas e melodias."
+      ]
+    },
+    {
+      "campo": "ESPAÇOS, TEMPOS, QUANTIDADES, RELAÇÕES E TRANSFORMAÇÕES",
+      "eixo_tematico": [
+        "Percepção tátil (forma, tamanho, espessura, textura, peso, consistência e temperatura);",
+        "Relações espaciais;",
+        "Percepção visual (forma, cor, tamanho e espessura);",
+        "Relações temporais;",
+        "Números;",
+        "Fenômenos da natureza: sol, vento, chuva;",
+        "Cuidado: plantas, animais e ambientes."
+      ],
+      "codigos_bncc": [
+        "EI02ET01",
+        "EI02ET02",
+        "EI02ET03",
+        "EI02ET04",
+        "EI02ET05",
+        "EI02ET06",
+        "EI02ET07",
+        "EI02ET08"
+      ],
+      "objetivos_bncc": [
+        "(EI02ET01) Explorar e descrever semelhanças e diferenças entre as características e propriedades dos objetos (textura, massa, tamanho);",
+        "(EI02ET02) Observar, relatar e descrever incidentes do cotidiano e fenômenos naturais (luz solar, vento, chuva etc.);",
+        "(EI02ET03) Compartilhar, com outras crianças, situações de cuidado de plantas e animais nos espaços da instituição e fora dela;",
+        "(EI02ET04) Identificar relações espaciais (dentro e fora, em cima, embaixo, acima, abaixo, entre e do lado) e temporais (antes, durante e depois);",
+        "(EI02ET05) Classificar objetos, considerando determinado atributo (tamanho, peso, cor, forma etc.);",
+        "(EI02ET06) Utilizar conceitos básicos de tempo (agora, antes, durante, depois, ontem, hoje, amanhã, lento, rápido, depressa, devagar);",
+        "(EI02ET07) Contar oralmente, objetos, pessoas, livros, etc, em contextos diversos;",
+        "(EI02ET08) Registrar com números a quantidade de crianças (meninas e meninos, presentes e ausentes) e a quantidade de objetos da mesma natureza, boneca, bolas, livros, etc;"
+      ]
+    }
+  ]
+}"</script>
+
+<script>
+(() => {
+"use strict";
+
+// ---------- utilidades ----------
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+const MESES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+
+function toast(mensagem, tipo) {
+  const area = $("#areaToast");
+  const el = document.createElement("div");
+  el.className = "toast" + (tipo ? " " + tipo : "");
+  el.textContent = mensagem;
+  area.appendChild(el);
+  setTimeout(() => { el.style.transition = "opacity .3s"; el.style.opacity = "0"; }, 3200);
+  setTimeout(() => el.remove(), 3600);
+}
+
+function escaparHtml(t) {
+  return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function formatarBytes(n) {
+  if (n < 1024) return n + " B";
+  if (n < 1024 * 1024) return (n / 1024).toFixed(1).replace(".", ",") + " KB";
+  return (n / 1024 / 1024).toFixed(1).replace(".", ",") + " MB";
+}
+
+async function chamarFuncao(payload) {
+  let resp;
+  try {
+    resp = await fetch("/.netlify/functions/gerar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+  } catch (e) {
+    throw new Error("Não foi possível falar com o servidor. Testando localmente? Use “netlify dev”. Em produção, verifique o deploy no Netlify.");
+  }
+  let dados = null;
+  try { dados = await resp.json(); } catch (e) { /* corpo sem JSON */ }
+  if (!resp.ok) {
+    throw new Error((dados && dados.error) || "O servidor respondeu com o status " + resp.status + ".");
+  }
+  return dados;
+}
+
+// ---------- tema (Claro / Escuro / Sistema) ----------
+const CHAVE_TEMA = "bncc-tema";
+const consultaEscura = window.matchMedia("(prefers-color-scheme: dark)");
+
+function temaPreferido() {
+  const salvo = localStorage.getItem(CHAVE_TEMA);
+  return salvo === "claro" || salvo === "escuro" || salvo === "sistema" ? salvo : "sistema";
+}
+
+let timerAnimTema = null;
+function aplicarTema() {
+  const pref = temaPreferido();
+  const efetivo = pref === "sistema" ? (consultaEscura.matches ? "escuro" : "claro") : pref;
+  document.documentElement.classList.add("tema-anim");
+  document.documentElement.dataset.tema = efetivo;
+  $$(".troca-tema button").forEach((b) => {
+    b.setAttribute("aria-checked", String(b.dataset.temaOpt === pref));
+  });
+  clearTimeout(timerAnimTema);
+  timerAnimTema = setTimeout(() => document.documentElement.classList.remove("tema-anim"), 420);
+}
+
+$$(".troca-tema button").forEach((b) => {
+  b.addEventListener("click", () => {
+    localStorage.setItem(CHAVE_TEMA, b.dataset.temaOpt);
+    aplicarTema();
+  });
+});
+if (consultaEscura.addEventListener) {
+  consultaEscura.addEventListener("change", () => { if (temaPreferido() === "sistema") aplicarTema(); });
+}
+
+// ---------- System Prompt Permanente ----------
+const PROMPT_PADRAO = ($("#prompt-padrao") ? $("#prompt-padrao").textContent : "")
+  .replace(/^\n/, "").replace(/\s+$/, "");
+const CHAVE_PROMPT = "bncc-prompt";
+const CHAVE_LIBERADO = "bncc-prompt-liberado";
+
+function promptAtual() {
+  return localStorage.getItem(CHAVE_PROMPT) || PROMPT_PADRAO;
+}
+
+const modal = $("#modalPrompt");
+const etapaSenha = $("#etapaSenha");
+const etapaEditor = $("#etapaEditor");
+
+function abrirModal() {
+  $("#erroSenha").hidden = true;
+  $("#campoSenha").value = "";
+  const liberado = sessionStorage.getItem(CHAVE_LIBERADO) === "1";
+  etapaSenha.hidden = liberado;
+  etapaEditor.hidden = !liberado;
+  if (liberado) $("#campoPrompt").value = promptAtual();
+  if (typeof modal.showModal === "function") {
+    if (!modal.open) modal.showModal();
+  } else {
+    modal.setAttribute("open", "");
+  }
+  setTimeout(() => { (liberado ? $("#campoPrompt") : $("#campoSenha")).focus(); }, 80);
+}
+
+function fecharModal() {
+  if (typeof modal.close === "function" && modal.open) modal.close();
+  else modal.removeAttribute("open");
+}
+
+$("#btnAbrirPrompt").addEventListener("click", abrirModal);
+$("#btnFecharModal").addEventListener("click", fecharModal);
+$("#btnCancelarSenha").addEventListener("click", fecharModal);
+
+async function desbloquear() {
+  const senha = $("#campoSenha").value;
+  if (!senha) {
+    $("#erroSenha").textContent = "Digite a senha para continuar.";
+    $("#erroSenha").hidden = false;
+    return;
+  }
+  const btn = $("#btnDesbloquear");
+  btn.disabled = true;
+  try {
+    await chamarFuncao({ action: "validar-senha", senha: senha });
+    $("#erroSenha").hidden = true;
+    sessionStorage.setItem(CHAVE_LIBERADO, "1");
+    etapaSenha.hidden = true;
+    etapaEditor.hidden = false;
+    $("#campoPrompt").value = promptAtual();
+    $("#campoPrompt").focus();
+    toast("Acesso liberado.", "ok");
+  } catch (e) {
+    $("#erroSenha").textContent = e.message;
+    $("#erroSenha").hidden = false;
+  } finally {
+    btn.disabled = false;
+    $("#campoSenha").value = "";
+  }
+}
+$("#btnDesbloquear").addEventListener("click", desbloquear);
+$("#campoSenha").addEventListener("keydown", (ev) => { if (ev.key === "Enter") desbloquear(); });
+
+$("#btnRestaurar").addEventListener("click", () => {
+  $("#campoPrompt").value = PROMPT_PADRAO;
+  toast("Padrão restaurado — clique em Salvar para confirmar.");
+});
+
+$("#btnSalvarPrompt").addEventListener("click", () => {
+  const texto = $("#campoPrompt").value.trim();
+  if (!texto) {
+    toast("O System Prompt não pode ficar vazio.", "erro");
+    return;
+  }
+  if (texto === PROMPT_PADRAO) localStorage.removeItem(CHAVE_PROMPT);
+  else localStorage.setItem(CHAVE_PROMPT, texto);
+  fecharModal();
+  toast("System Prompt Permanente salvo neste navegador.", "ok");
+});
+
+// ---------- anexos (calendário opcional) ----------
+const LIMITE_PDF = 4 * 1024 * 1024;
+const LIMITE_TEXTO = 1024 * 1024;
+const LIMITE_TOTAL_BASE64 = 5200000;
+let anexos = [];
+
+const zona = $("#zonaArquivo");
+const inputArquivo = $("#campoArquivo");
+const listaArquivos = $("#listaArquivos");
+
+const EXT_OK = ["pdf", "png", "jpg", "jpeg", "webp", "txt", "md"];
+
+function extensaoDe(nome) {
+  const m = /\.([a-z0-9]+)$/i.exec(nome);
+  return m ? m[1].toLowerCase() : "";
+}
+
+function redrawLista() {
+  listaArquivos.innerHTML = "";
+  anexos.forEach((a, i) => {
+    const item = document.createElement("div");
+    item.className = "arquivo-item";
+    const selo = document.createElement("span");
+    selo.className = "selo " + (a.tipo === "img" ? "img" : a.tipo === "pdf" ? "pdf" : "txt");
+    selo.textContent = a.rotulo;
+    const info = document.createElement("div");
+    info.className = "info";
+    const nome = document.createElement("strong");
+    nome.textContent = a.nome;
+    nome.title = a.nome;
+    const tam = document.createElement("span");
+    tam.textContent = formatarBytes(a.bytes) + (a.tipo === "img" ? " · otimizada" : "");
+    info.appendChild(nome);
+    info.appendChild(tam);
+    const remover = document.createElement("button");
+    remover.type = "button";
+    remover.className = "remover";
+    remover.setAttribute("aria-label", "Remover " + a.nome);
+    remover.textContent = "×";
+    remover.addEventListener("click", () => {
+      anexos.splice(i, 1);
+      redrawLista();
+    });
+    item.appendChild(selo);
+    item.appendChild(info);
+    item.appendChild(remover);
+    listaArquivos.appendChild(item);
+  });
+}
+
+function arquivoParaBase64(file) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onerror = () => reject(new Error("falha de leitura"));
+    r.onload = () => resolve(String(r.result).split(",")[1]);
+    r.readAsDataURL(file);
+  });
+}
+
+async function otimizarImagem(file) {
+  try {
+    const bitmap = await createImageBitmap(file);
+    const LADO = 1600;
+    const fator = Math.min(1, LADO / Math.max(bitmap.width, bitmap.height));
+    const w = Math.max(1, Math.round(bitmap.width * fator));
+    const h = Math.max(1, Math.round(bitmap.height * fator));
+    const tela = document.createElement("canvas");
+    tela.width = w;
+    tela.height = h;
+    const ctx = tela.getContext("2d");
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, w, h);
+    ctx.drawImage(bitmap, 0, 0, w, h);
+    if (bitmap.close) bitmap.close();
+    const url = tela.toDataURL("image/jpeg", 0.85);
+    return { mime: "image/jpeg", dados: url.split(",")[1] };
+  } catch (e) {
+    return { mime: file.type || "image/png", dados: await arquivoParaBase64(file) };
+  }
+}
+
+async function adicionarArquivos(arquivos) {
+  for (const file of arquivos) {
+    const ext = extensaoDe(file.name);
+    if (!EXT_OK.includes(ext)) {
+      toast("Formato não aceito: “" + file.name + "”. Use PDF, imagem, TXT ou MD.", "erro");
+      continue;
+    }
+    try {
+      let anexo;
+      if (ext === "png" || ext === "jpg" || ext === "jpeg" || ext === "webp") {
+        const otimizada = await otimizarImagem(file);
+        anexo = {
+          nome: file.name, tipo: "img", rotulo: "IMG",
+          mime: otimizada.mime, dados: otimizada.dados,
+          bytes: Math.round(otimizada.dados.length * 0.75),
+        };
+      } else if (ext === "pdf") {
+        if (file.size > LIMITE_PDF) {
+          toast("PDF grande demais (máx. 4 MB): “" + file.name + "”.", "erro");
+          continue;
+        }
+        anexo = {
+          nome: file.name, tipo: "pdf", rotulo: "PDF",
+          mime: "application/pdf", dados: await arquivoParaBase64(file),
+          bytes: file.size,
+        };
+      } else {
+        if (file.size > LIMITE_TEXTO) {
+          toast("Arquivo de texto grande demais (máx. 1 MB): “" + file.name + "”.", "erro");
+          continue;
+        }
+        const texto = await file.text();
+        anexo = { nome: file.name, tipo: "txt", rotulo: ext.toUpperCase(), texto: texto.slice(0, 120000), bytes: file.size };
+      }
+      anexos.push(anexo);
+      redrawLista();
+    } catch (e) {
+      toast("Não foi possível ler “" + file.name + "”.", "erro");
+    }
+  }
+
+  // garante o limite total (a função serverless também confere)
+  let total = anexos.reduce((s, a) => s + (a.dados ? a.dados.length : a.texto.length), 0);
+  while (total > LIMITE_TOTAL_BASE64 && anexos.length > 0) {
+    const fora = anexos.pop();
+    total -= (fora.dados ? fora.dados.length : fora.texto.length);
+    toast("“" + fora.nome + "” removido: o conjunto passa de 4 MB no total.", "erro");
+  }
+  redrawLista();
+}
+
+zona.addEventListener("click", () => inputArquivo.click());
+zona.addEventListener("keydown", (ev) => {
+  if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); inputArquivo.click(); }
+});
+zona.addEventListener("dragover", (ev) => { ev.preventDefault(); zona.classList.add("foco"); });
+zona.addEventListener("dragleave", () => zona.classList.remove("foco"));
+zona.addEventListener("drop", (ev) => {
+  ev.preventDefault();
+  zona.classList.remove("foco");
+  if (ev.dataTransfer && ev.dataTransfer.files) adicionarArquivos(ev.dataTransfer.files);
+});
+inputArquivo.addEventListener("change", () => {
+  if (inputArquivo.files) adicionarArquivos(inputArquivo.files);
+  inputArquivo.value = "";
+});
+
+
+// ---------- estado do formulário ----------
+const CHAVE_GRUPO = "bncc-grupo";
+const CHAVE_MODELO = "bncc-modelo";
+const CHAVE_MES = "bncc-mes";
+const CHAVE_ANO = "bncc-ano";
+
+const seletorGrupo = $("#seletorGrupo");
+const chipPrefixo = $("#chipPrefixo");
+const campoMes = $("#campoMes");
+const campoAno = $("#campoAno");
+const campoModelo = $("#campoModelo");
+const campoObs = $("#campoObs");
+const btnGerar = $("#btnGerar");
+
+MESES.forEach((nome, i) => {
+  const op = document.createElement("option");
+  op.value = String(i + 1);
+  op.textContent = nome;
+  campoMes.appendChild(op);
+});
+
+const hoje = new Date();
+campoMes.value = String(hoje.getMonth() + 1);
+campoAno.value = String(hoje.getFullYear());
+
+function grupoSelecionado() {
+  const ativo = seletorGrupo.querySelector('[aria-checked="true"]');
+  return ativo ? Number(ativo.dataset.grupo) : 3;
+}
+
+function atualizarChipPrefixo() {
+  chipPrefixo.textContent = "Códigos com o prefixo EI0" + grupoSelecionado();
+}
+
+seletorGrupo.addEventListener("click", (ev) => {
+  const botao = ev.target.closest("button[data-grupo]");
+  if (!botao) return;
+  seletorGrupo.querySelectorAll("button").forEach((b) => b.setAttribute("aria-checked", String(b === botao)));
+  atualizarChipPrefixo();
+  localStorage.setItem(CHAVE_GRUPO, botao.dataset.grupo);
+});
+
+(function restaurarPreferencias() {
+  const g = localStorage.getItem(CHAVE_GRUPO);
+  if (g === "1" || g === "2" || g === "3") {
+    seletorGrupo.querySelectorAll("button").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.grupo === g)));
+  }
+  atualizarChipPrefixo();
+  const m = Number(localStorage.getItem(CHAVE_MES));
+  if (m >= 1 && m <= 12) campoMes.value = String(m);
+  const a = Number(localStorage.getItem(CHAVE_ANO));
+  if (a >= 2024 && a <= 2035) campoAno.value = String(a);
+  const mod = localStorage.getItem(CHAVE_MODELO);
+  if (mod) {
+    for (const op of campoModelo.options) {
+      if (op.value === mod) { campoModelo.value = mod; break; }
+    }
+  }
+})();
+
+campoMes.addEventListener("change", () => localStorage.setItem(CHAVE_MES, campoMes.value));
+campoAno.addEventListener("change", () => localStorage.setItem(CHAVE_ANO, campoAno.value));
+campoModelo.addEventListener("change", () => localStorage.setItem(CHAVE_MODELO, campoModelo.value));
+
+// ---------- montagem do pedido ----------
+function adaptarGrupo(promptBase, grupo) {
+  let p = promptBase
+    .split("GRUPO 3 / G3").join("GRUPO " + grupo + " / G" + grupo)
+    .split("EI02").join("EI0" + grupo);
+  p += "\n\n—— INSTRUÇÃO DO APLICATIVO ——\n" +
+    "GRUPO SELECIONADO PELO USUÁRIO: GRUPO " + grupo + ".\n" +
+    "Os códigos BNCC do planejamento devem usar exclusivamente o prefixo EI0" + grupo +
+    " e o planejamento deve indicar o GRUPO " + grupo + ".\n" +
+    "Adapte as atividades e os objetivos à faixa etária desse grupo.";
+  return p;
+}
+
+function construirPedido(grupo) {
+  const mes = Number(campoMes.value);
+  const ano = Number(campoAno.value) || hoje.getFullYear();
+  const nomeMes = MESES[mes - 1];
+  const linhas = [];
+  linhas.push("Gere o planejamento mensal de " + nomeMes + " de " + ano + " para o GRUPO " + grupo + ".");
+  const temAnexo = anexos.length > 0;
+  if (temAnexo) {
+    linhas.push("Um calendário estudantil foi anexado a esta mensagem; use as datas letivas dele para montar a coluna DATA.");
+  } else {
+    linhas.push("Nenhum calendário foi anexado; considere os dias letivos habituais de um mês escolar.");
+  }
+  for (const a of anexos) {
+    if (a.texto) linhas.push("CALENDÁRIO ESCOLAR ANEXADO (“" + a.nome + "”), conteúdo:\n" + a.texto);
+  }
+  const obs = campoObs.value.trim();
+  if (obs) linhas.push("Observações da professora: " + obs);
+  linhas.push("Retorne apenas a tabela Markdown, conforme a REGRA CRÍTICA DE FORMATO.");
+  return { texto: linhas.join("\n\n"), nomeMes: nomeMes, ano: ano };
+}
+
+// ---------- extração e renderização da tabela ----------
+function extrairTabela(texto) {
+  const semFences = texto.replace(/```[a-zA-Z]*\n?/g, "");
+  const linhas = semFences.split(/\r?\n/);
+  let melhor = [];
+  let atual = [];
+  for (const linha of linhas) {
+    const t = linha.trim();
+    if (t.startsWith("|") && t.endsWith("|")) atual.push(t);
+    else { if (atual.length > melhor.length) melhor = atual; atual = []; }
+  }
+  if (atual.length > melhor.length) melhor = atual;
+  if (melhor.length < 2) return null;
+  const celulas = melhor.map((l) => l.slice(1, -1).split("|").map((c) => c.trim()));
+  const ehSeparador = (linha) => linha.every((c) => /^:?-{3,}:?$/.test(c));
+  const cab = celulas[0];
+  const corpo = celulas.slice(1).filter((l) => !ehSeparador(l));
+  if (!cab.length || !corpo.length) return null;
+  return { cab: cab, corpo: corpo, bruto: melhor.join("\n") };
+}
+
+function markdownInline(seguro) {
+  return seguro
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*([^*]+)\*/g, "<em>$1</em>");
+}
+
+function limparItem(l) {
+  return l.replace(/^\*+/, "").replace(/\*+$/, "").trim();
+}
+
+function renderTabela(tabela) {
+  const cont = document.createElement("div");
+  cont.className = "rolagem-tabela";
+  const classes = ["col-data", "col-eixo", "col-codigos", "col-detalhe"];
+  const table = document.createElement("table");
+  table.className = "plano";
+  let html = "<thead><tr>";
+  tabela.cab.forEach((c, i) => {
+    html += '<th class="' + (classes[i] || "") + '">' + escaparHtml(c.replace(/\*/g, "").trim()) + "</th>";
+  });
+  html += "</tr></thead><tbody>";
+  tabela.corpo.forEach((linha) => {
+    html += "<tr>";
+    linha.forEach((c, i) => {
+      const itens = c.replace(/<br\s*\/?>/gi, "\n").split("\n").map((x) => x.trim()).filter(Boolean);
+      if (i === 0) {
+        html += '<td class="col-data"><span class="data-pilula">' +
+          escaparHtml(itens.join(" ").replace(/\*/g, "").trim()) + "</span></td>";
+      } else if (i === 1) {
+        html += '<td class="col-eixo">' +
+          itens.map((l) => "<em>" + markdownInline(escaparHtml(limparItem(l))) + "</em>").join("") + "</td>";
+      } else if (i === 2) {
+        html += '<td class="col-codigos">' +
+          itens.map((l) => '<span class="codigo">' + markdownInline(escaparHtml(limparItem(l))) + "</span>").join("") + "</td>";
+      } else {
+        html += '<td class="' + (classes[i] || "") + '">' +
+          itens.map((l) => '<div class="linha-ativ">' + markdownInline(escaparHtml(limparItem(l))) + "</div>").join("") + "</td>";
+      }
+    });
+    html += "</tr>";
+  });
+  html += "</tbody>";
+  table.innerHTML = html;
+  cont.appendChild(table);
+  return cont;
+}
+
+// ---------- estados do painel de resultado ----------
+const conteudo = $("#conteudoResultado");
+const alternador = $("#alternadorVisao");
+const ferramentas = $("#ferramentas");
+const etiquetas = $("#etiquetas");
+
+let ultimaTabela = null;
+let ultimoTexto = "";
+let gerando = false;
+let timerTempo = null;
+
+function visaoAtual() {
+  const b = alternador.querySelector('[aria-checked="true"]');
+  return b ? b.dataset.visao : "renderizado";
+}
+
+alternador.addEventListener("click", (ev) => {
+  const botao = ev.target.closest("button[data-visao]");
+  if (!botao || !ultimoTexto) return;
+  alternador.querySelectorAll("button").forEach((b) => b.setAttribute("aria-checked", String(b === botao)));
+  desenharResultado();
+});
+
+function ilustracaoVazia() {
+  const wrap = document.createElement("div");
+  wrap.innerHTML =
+    '<svg viewBox="0 0 260 150" role="img" aria-label="Ilustração de planejamento">' +
+    '<ellipse cx="130" cy="132" rx="92" ry="10" fill="var(--sol-suave)"/>' +
+    '<path d="M38 84h184v40a8 8 0 0 1-8 8H46a8 8 0 0 1-8-8z" fill="var(--sol)"/>' +
+    '<path d="M38 84h184v9H38z" fill="var(--sol-vivo)"/>' +
+    '<circle cx="130" cy="52" r="20" fill="var(--sol)"/>' +
+    '<g stroke="var(--sol)" stroke-width="5" stroke-linecap="round">' +
+    '<path d="M130 22v9"/><path d="M107 30l6 8"/><path d="M153 30l-6 8"/><path d="M98 52h10"/><path d="M152 52h10"/></g>' +
+    '<path d="M60 62c10-7 22-7 34 2 12-9 24-9 34-2v16c-10-7-22-7-34 2-12-9-24-9-34-2z" fill="var(--ceu-suave)"/>' +
+    '<circle cx="212" cy="38" r="7" fill="var(--coral)"/>' +
+    '<rect x="34" y="30" width="14" height="14" rx="4" fill="var(--folha)"/>' +
+    '<path d="M232 88l8-14 8 14z" fill="var(--ceu)"/>' +
+    '<text x="130" y="114" text-anchor="middle" font-family="Fredoka, sans-serif" font-size="15" font-weight="600" fill="#FFFFFF">BNCC</text>' +
+    "</svg>";
+  return wrap;
+}
+
+function mostrarVazio() {
+  conteudo.innerHTML = "";
+  const estado = document.createElement("div");
+  estado.className = "estado";
+  const ilustracao = ilustracaoVazia();
+  estado.appendChild(ilustracao);
+  const h = document.createElement("h3");
+  h.textContent = "Seu planejamento aparece aqui";
+  const p = document.createElement("p");
+  p.textContent = "Escolha o grupo, o mês e o ano ao lado e toque em “Gerar planejamento”. O calendário estudantil é opcional.";
+  estado.appendChild(h);
+  estado.appendChild(p);
+  conteudo.appendChild(estado);
+}
+
+function mostrarCarregando() {
+  conteudo.innerHTML = "";
+  const estado = document.createElement("div");
+  estado.className = "estado-carregando";
+  estado.innerHTML =
+    '<svg class="sol-gira" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">' +
+    '<circle cx="12" cy="12" r="4.6" fill="var(--sol)" stroke="none"/>' +
+    '<path d="M12 2.8v2M12 19.2v2M2.8 12h2M19.2 12h2M5.2 5.2l1.5 1.5M17.3 17.3l1.5 1.5M18.8 5.2l-1.5 1.5M6.7 17.3l-1.5 1.5"/></svg>' +
+    "<h3>Gerando planejamento…</h3>" +
+    '<p><span id="tempoGasto">0 s</span> · o modelo está organizando os campos de experiência</p>';
+  conteudo.appendChild(estado);
+  const inicio = Date.now();
+  clearInterval(timerTempo);
+  timerTempo = setInterval(() => {
+    const alvo = document.getElementById("tempoGasto");
+    if (alvo) alvo.textContent = Math.round((Date.now() - inicio) / 1000) + " s";
+  }, 1000);
+}
+
+function mostrarErro(mensagem) {
+  clearInterval(timerTempo);
+  conteudo.innerHTML = "";
+  const caixa = document.createElement("div");
+  caixa.className = "erro-caixa";
+  const t = document.createElement("strong");
+  t.textContent = "Não foi possível gerar agora";
+  const p = document.createElement("p");
+  p.textContent = mensagem;
+  const b = document.createElement("button");
+  b.type = "button";
+  b.textContent = "Tentar novamente";
+  b.addEventListener("click", gerar);
+  caixa.appendChild(t);
+  caixa.appendChild(p);
+  caixa.appendChild(b);
+  conteudo.appendChild(caixa);
+}
+
+function desenharResultado() {
+  if (!ultimoTexto) { mostrarVazio(); return; }
+  conteudo.innerHTML = "";
+  if (visaoAtual() === "renderizado" && ultimaTabela) {
+    conteudo.appendChild(renderTabela(ultimaTabela));
+  } else {
+    const pre = document.createElement("div");
+    pre.className = "visao-markdown";
+    const code = document.createElement("code");
+    code.textContent = ultimaTabela ? ultimaTabela.bruto : ultimoTexto;
+    pre.appendChild(code);
+    conteudo.appendChild(pre);
+  }
+}
+
+
+// ---------- ações (copiar / baixar / imprimir) ----------
+async function copiarTexto(texto) {
+  try {
+    await navigator.clipboard.writeText(texto);
+    return true;
+  } catch (e) {
+    const ta = document.createElement("textarea");
+    ta.value = texto;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    let ok = false;
+    try { ok = document.execCommand("copy"); } catch (e2) { ok = false; }
+    ta.remove();
+    return ok;
+  }
+}
+
+function baixarArquivo(conteudoStr, nome, tipo) {
+  const blob = new Blob([conteudoStr], { type: tipo + ";charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = nome;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+
+function nomeBaseArquivo() {
+  const grupo = grupoSelecionado();
+  const mes = Number(campoMes.value);
+  const ano = Number(campoAno.value) || hoje.getFullYear();
+  return "plano-bncc-grupo" + grupo + "-" + MESES[mes - 1].toLowerCase() + "-" + ano;
+}
+
+const CSS_EXPORT =
+  "body{margin:0;padding:32px;background:#fff;font-family:Arial,Helvetica,sans-serif;color:#333}" +
+  "h1{font-size:20px;margin:0 0 4px}" +
+  "p.sub{margin:0 0 18px;color:#777;font-size:12px}" +
+  ".rolagem{overflow-x:auto}" +
+  "table.plano{width:100%;border-collapse:collapse;border:1px solid #ddd;font-size:12px}" +
+  "table.plano th{background:#FFF1D6;border:1px solid #e5c98d;padding:8px;text-align:left;text-transform:uppercase;font-size:11px;letter-spacing:.04em}" +
+  "table.plano td{border:1px solid #e8e2d4;padding:8px;vertical-align:top;line-height:1.5}" +
+  ".data-pilula{display:inline-block;background:#F5A21B;color:#3A2708;font-weight:700;padding:2px 10px;border-radius:999px;font-size:11px}" +
+  ".codigo{display:inline-block;background:#E1F3E7;color:#2E7A4B;font-weight:700;padding:1px 7px;border-radius:6px;margin:1px 0;font-size:11px}" +
+  "em{color:#3E97C9}" +
+  "@media print{body{padding:0}}";
+
+function baixarHtml() {
+  if (!ultimaTabela) return;
+  const tabelaEl = conteudo.querySelector("table.plano");
+  if (!tabelaEl) return;
+  const grupo = grupoSelecionado();
+  const titulo = "Planejamento mensal — GRUPO " + grupo;
+  const sub = $("#etiquetaMes").textContent + " · gerado com PlanoBNCC";
+  const doc =
+    "<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n" +
+    '<meta charset="utf-8">\n' +
+    '<meta name="viewport" content="width=device-width, initial-scale=1">\n' +
+    "<title>Planejamento mensal — PlanoBNCC</title>\n" +
+    "<style>\n" + CSS_EXPORT + "\n</style>\n</head>\n<body>\n" +
+    "<main>\n<h1>" + escaparHtml(titulo) + "</h1>\n" +
+    '<p class="sub">' + escaparHtml(sub) + "</p>\n" +
+    '<div class="rolagem">\n' + tabelaEl.outerHTML + "\n</div>\n</main>\n</body>\n</html>\n";
+  baixarArquivo(doc, nomeBaseArquivo() + ".html", "text/html");
+  toast("Arquivo HTML baixado.", "ok");
+}
+
+$("#btnCopiar").addEventListener("click", async () => {
+  const texto = ultimaTabela ? ultimaTabela.bruto : ultimoTexto;
+  const ok = await copiarTexto(texto);
+  toast(ok ? "Markdown copiado para a área de transferência." : "Não foi possível copiar automaticamente.", ok ? "ok" : "erro");
+});
+
+$("#btnBaixarMd").addEventListener("click", () => {
+  const texto = ultimaTabela ? ultimaTabela.bruto : ultimoTexto;
+  baixarArquivo(texto, nomeBaseArquivo() + ".md", "text/markdown");
+  toast("Arquivo .md baixado.", "ok");
+});
+
+$("#btnBaixarHtml").addEventListener("click", baixarHtml);
+
+$("#btnImprimir").addEventListener("click", () => {
+  if (visaoAtual() !== "renderizado" || !ultimaTabela) {
+    alternador.querySelectorAll("button").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.visao === "renderizado")));
+    desenharResultado();
+  }
+  setTimeout(() => window.print(), 120);
+});
+
+// ---------- geração ----------
+async function gerar() {
+  if (gerando) return;
+  const grupo = grupoSelecionado();
+  const pedidoInfo = construirPedido(grupo);
+  const payload = {
+    action: "gerar",
+    model: campoModelo.value,
+    systemPrompt: adaptarGrupo(promptAtual(), grupo),
+    pedido: pedidoInfo.texto,
+    anexos: anexos.filter((a) => a.dados).map((a) => ({ mime: a.mime, dados: a.dados })),
+  };
+
+  gerando = true;
+  btnGerar.disabled = true;
+  btnGerar.classList.add("carregando");
+  const rotulo = btnGerar.querySelector("span");
+  const rotuloOriginal = rotulo.textContent;
+  rotulo.textContent = "Gerando…";
+  mostrarCarregando();
+
+  try {
+    const resposta = await chamarFuncao(payload);
+    ultimoTexto = String(resposta.texto || "").trim();
+    ultimaTabela = extrairTabela(ultimoTexto);
+    if (!ultimoTexto) {
+      mostrarErro("O modelo não retornou conteúdo. Tente novamente ou escolha outro modelo.");
+      return;
+    }
+    $("#etiquetaMes").textContent = pedidoInfo.nomeMes + " · " + pedidoInfo.ano;
+    $("#etiquetaGrupo").textContent = "GRUPO " + grupo;
+    $("#etiquetaModelo").textContent = campoModelo.value;
+    etiquetas.hidden = false;
+    ferramentas.hidden = false;
+    // o modo renderizado é o padrão logo após gerar
+    alternador.querySelectorAll("button").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.visao === "renderizado")));
+    desenharResultado();
+    if (!ultimaTabela) {
+      toast("O modelo não devolveu uma tabela reconhecível — veja o modo Markdown.", "erro");
+    } else {
+      toast("Planejamento pronto!", "ok");
+    }
+  } catch (e) {
+    mostrarErro(e.message);
+  } finally {
+    clearInterval(timerTempo);
+    gerando = false;
+    btnGerar.disabled = false;
+    btnGerar.classList.remove("carregando");
+    rotulo.textContent = rotuloOriginal;
+  }
+}
+
+btnGerar.addEventListener("click", gerar);
+
+// ---------- início ----------
+aplicarTema();
+mostrarVazio();
+
+})();
+
+</script>
+</body>
+</html>
